@@ -140,7 +140,7 @@ var define, requireModule, require, requirejs;
   };
 
   function findModule(name, referrer) {
-    name = name.replace('mahara-client/app', 'mahara-client');
+    name = name !== 'mahara-client/app' ? name.replace('mahara-client/app', 'mahara-client') : name;
     var mod = registry[name];
 
     while (mod && mod.callback instanceof Alias) {
