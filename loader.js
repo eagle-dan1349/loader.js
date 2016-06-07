@@ -1,6 +1,6 @@
 var define, requireModule, require, requirejs;
 
-(function() {
+(function () {
   'use strict';
 
   var _isArray;
@@ -13,41 +13,41 @@ var define, requireModule, require, requirejs;
   }
 
   var registry = {};
-  var seen = {};
-  var FAILED = false;
-  var LOADED = true;
+  var seen     = {};
+  var FAILED   = false;
+  var LOADED   = true;
 
   var uuid = 0;
 
   function unsupportedModule(length) {
     throw new Error('an unsupported module was defined, expected `define(name, deps, module)` instead got: `' +
-                    length + '` arguments to define`');
+      length + '` arguments to define`');
   }
 
   var defaultDeps = ['require', 'exports', 'module'];
 
   function Module(name, deps, callback) {
-    this.id        = uuid++;
-    this.name      = name;
-    this.deps      = !deps.length && callback.length ? defaultDeps : deps;
-    this.module    = { exports: {} };
-    this.callback  = callback;
-    this.state     = undefined;
-    this._require  = undefined;
-    this.finalized = false;
+    this.id              = uuid++;
+    this.name            = name;
+    this.deps            = !deps.length && callback.length ? defaultDeps : deps;
+    this.module          = {exports: {}};
+    this.callback        = callback;
+    this.state           = undefined;
+    this._require        = undefined;
+    this.finalized       = false;
     this.hasExportsAsDep = false;
   }
 
-  Module.prototype.makeDefaultExport = function() {
+  Module.prototype.makeDefaultExport = function () {
     var exports = this.module.exports;
     if (exports !== null &&
-        (typeof exports === 'object' || typeof exports === 'function') &&
-          exports['default'] === undefined) {
+      (typeof exports === 'object' || typeof exports === 'function') &&
+      exports['default'] === undefined) {
       exports['default'] = exports;
     }
   };
 
-  Module.prototype.exports = function(reifiedDeps) {
+  Module.prototype.exports = function (reifiedDeps) {
     if (this.finalized) {
       return this.module.exports;
     } else {
@@ -61,15 +61,15 @@ var define, requireModule, require, requirejs;
     }
   };
 
-  Module.prototype.unsee = function() {
+  Module.prototype.unsee = function () {
     this.finalized = false;
-    this.state = undefined;
-    this.module = { exports: {}};
+    this.state     = undefined;
+    this.module    = {exports: {}};
   };
 
-  Module.prototype.reify = function() {
-    var deps = this.deps;
-    var length = deps.length;
+  Module.prototype.reify = function () {
+    var deps    = this.deps;
+    var length  = deps.length;
     var reified = new Array(length);
     var dep;
 
@@ -77,7 +77,7 @@ var define, requireModule, require, requirejs;
       dep = deps[i];
       if (dep === 'exports') {
         this.hasExportsAsDep = true;
-        reified[i] = this.module.exports;
+        reified[i]           = this.module.exports;
       } else if (dep === 'require') {
         reified[i] = this.makeRequire();
       } else if (dep === 'module') {
@@ -90,29 +90,31 @@ var define, requireModule, require, requirejs;
     return reified;
   };
 
-  Module.prototype.makeRequire = function() {
+  Module.prototype.makeRequire = function () {
     var name = this.name;
 
-    return this._require || (this._require = function(dep) {
-      return require(resolve(dep, name));
-    });
+    return this._require || (this._require = function (dep) {
+        return require(resolve(dep, name));
+      });
   };
 
-  Module.prototype.build = function() {
-    if (this.state === FAILED) { return; }
+  Module.prototype.build = function () {
+    if (this.state === FAILED) {
+      return;
+    }
     this.state = FAILED;
     this.exports(this.reify());
     this.state = LOADED;
   };
 
-  define = function(name, deps, callback) {
+  define = function (name, deps, callback) {
     if (arguments.length < 2) {
       unsupportedModule(arguments.length);
     }
 
     if (!_isArray(deps)) {
       callback = deps;
-      deps     =  [];
+      deps     = [];
     }
 
     registry[name] = new Module(name, deps, callback);
@@ -121,13 +123,13 @@ var define, requireModule, require, requirejs;
   // we don't support all of AMD
   // define.amd = {};
   // we will support petals...
-  define.petal = { };
+  define.petal = {};
 
   function Alias(path) {
     this.name = path;
   }
 
-  define.alias = function(path) {
+  define.alias = function (path) {
     return new Alias(path);
   };
 
@@ -135,30 +137,51 @@ var define, requireModule, require, requirejs;
     throw new Error('Could not find module `' + name + '` imported from `' + referrer + '`');
   }
 
-  requirejs = require = requireModule = function(name) {
+  requirejs = require = requireModule = function (name) {
     return findModule(name, '(require)').module.exports;
   };
 
+  function __normalize(name) {
+
+    const projectRoots = [
+      'agora/app',
+      'scribe/app',
+      'trac/app',
+      'core/app'
+    ];
+
+    if (!projectRoots.contains(name)) {
+      return name.replace('/addon', '') // for in repo addons
+                 .replace('/app', '');  // for current project
+    } else {
+      return name;
+    }
+  }
+
   function findModule(name, referrer) {
-    name = name !== 'mahara-client/app' ? name.replace('mahara-client/app', 'mahara-client') : name;
+    name    = __normalize(name);
     var mod = registry[name];
 
     while (mod && mod.callback instanceof Alias) {
       name = mod.callback.name;
-      mod = registry[name];
+      mod  = registry[name];
     }
 
-    if (!mod) { missingModule(name, referrer); }
+    if (!mod) {
+      missingModule(name, referrer);
+    }
 
     mod.build();
     return mod;
   }
 
   function resolve(child, name) {
-    if (child.charAt(0) !== '.') { return child; }
+    if (child.charAt(0) !== '.') {
+      return child;
+    }
 
-    var parts = child.split('/');
-    var nameParts = name.split('/');
+    var parts      = child.split('/');
+    var nameParts  = name.split('/');
     var parentBase = nameParts.slice(0, -1);
 
     for (var i = 0, l = parts.length; i < l; i++) {
@@ -169,20 +192,21 @@ var define, requireModule, require, requirejs;
           throw new Error('Cannot access parent module of root');
         }
         parentBase.pop();
-      } else if (part === '.') {
-        continue;
-      } else { parentBase.push(part); }
+      } else if (part !== '.') {
+        parentBase.push(part);
+      }
     }
 
     return parentBase.join('/');
   }
 
   requirejs.entries = requirejs._eak_seen = registry;
-  requirejs.unsee = function(moduleName) {
-    findModule(moduleName, '(unsee)').unsee();
+  requirejs.unsee = function (moduleName) {
+    findModule(moduleName, '(unsee)')
+      .unsee();
   };
 
-  requirejs.clear = function() {
+  requirejs.clear = function () {
     requirejs.entries = requirejs._eak_seen = registry = {};
     seen = {};
   };
