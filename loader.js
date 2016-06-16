@@ -12,6 +12,13 @@ var define, requireModule, require, requirejs;
     _isArray = Array.isArray;
   }
 
+  const projectRoots = [
+    'agora/app',
+    'scribe/app',
+    'trac/app',
+    'core/app'
+  ];
+
   var registry = {};
   var seen     = {};
   var FAILED   = false;
@@ -142,17 +149,12 @@ var define, requireModule, require, requirejs;
   };
 
   function __normalize(name) {
-
-    const projectRoots = [
-      'agora/app',
-      'scribe/app',
-      'trac/app',
-      'core/app'
-    ];
-
     if (!projectRoots.contains(name)) {
       return name.replace('/addon', '') // for in repo addons
-                 .replace('/app', '');  // for current project
+                 .replace('agora/app', 'agora/')  // for current project
+                 .replace('scribe/app', 'scribe/')  // for current project
+                 .replace('trac/app', 'trac/')  // for current project
+                 .replace('core/app', 'core/');  // for current project
     } else {
       return name;
     }
