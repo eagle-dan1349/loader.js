@@ -151,10 +151,10 @@ var define, requireModule, require, requirejs;
   function __normalize(name) {
     if (!projectRoots.contains(name)) {
       return name.replace('/addon', '') // for in repo addons
-                 .replace('agora/app', 'agora/')  // for current project
-                 .replace('scribe/app', 'scribe/')  // for current project
-                 .replace('trac/app', 'trac/')  // for current project
-                 .replace('core/app', 'core/');  // for current project
+                 .replace('agora/app', 'agora')  // for current project
+                 .replace('scribe/app', 'scribe')  // for current project
+                 .replace('trac/app', 'trac')  // for current project
+                 .replace('core/app', 'core');  // for current project
     } else {
       return name;
     }
