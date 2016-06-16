@@ -150,7 +150,7 @@ var define, requireModule, require, requirejs;
 
   function __normalize(name) {
     if (!projectRoots.contains(name)) {
-      return name.replace('/addon', '') // for in repo addons
+      return name.replace('core/addon', 'core') // for in repo addons
                  .replace('agora/app', 'agora')  // for current project
                  .replace('scribe/app', 'scribe')  // for current project
                  .replace('trac/app', 'trac')  // for current project
