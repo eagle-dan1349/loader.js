@@ -14,6 +14,7 @@ var define, requireModule, require, requirejs;
 
   const projectRoots = [
     'agora/app',
+    'inbound/app',
     'scribe/app',
     'trac/app',
     'core/app'
@@ -150,11 +151,12 @@ var define, requireModule, require, requirejs;
 
   function __normalize(name) {
     if (!projectRoots.contains(name)) {
-      return name.replace('core/addon', 'core') // for in repo addons
-                 .replace('agora/app', 'agora')  // for current project
-                 .replace('scribe/app', 'scribe')  // for current project
-                 .replace('trac/app', 'trac')  // for current project
-                 .replace('core/app', 'core');  // for current project
+      return name.replace('core/addon', 'core')
+                 .replace('agora/app', 'agora')
+                 .replace('inbound/app', 'inbound')
+                 .replace('scribe/app', 'scribe')
+                 .replace('trac/app', 'trac')
+                 .replace('core/app', 'core');
     } else {
       return name;
     }
