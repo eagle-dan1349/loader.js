@@ -14,6 +14,7 @@ var define, requireModule, require, requirejs;
 
   const projectRoots = [
     'agora/app',
+    'cardo/app',
     'inbound/app',
     'scribe/app',
     'trac/app',
@@ -153,6 +154,7 @@ var define, requireModule, require, requirejs;
     if (!projectRoots.contains(name)) {
       return name.replace('core/addon', 'core')
                  .replace('agora/app', 'agora')
+                 .replace('cardo/app', 'cardo')
                  .replace('inbound/app', 'inbound')
                  .replace('scribe/app', 'scribe')
                  .replace('trac/app', 'trac')
